@@ -9,6 +9,7 @@ def demextract(directory=None,destination=None,delete=None):
         os.makedirs(os.path.join(destination,"pgcdem"))
         os.makedirs(os.path.join(destination,"pgcmeta"))
         os.makedirs(os.path.join(destination,"pgcmt"))
+        os.makedirs(os.path.join(destination,"pgcreg"))
     else:
         if not os.path.exists(os.path.join(destination,"pgcdem")):
             os.makedirs(os.path.join(destination,"pgcdem"))
@@ -16,6 +17,8 @@ def demextract(directory=None,destination=None,delete=None):
             os.makedirs(os.path.join(destination,"pgcmeta"))
         if not os.path.exists(os.path.join(destination,"pgcmt")):
             os.makedirs(os.path.join(destination,"pgcmt"))
+        if not os.path.exists(os.path.join(destination,"pgcreg")):
+            os.makedirs(os.path.join(destination,"pgcreg"))
     filesdem = os.listdir(os.path.join(destination,"pgcdem"))
     for fdem in filesdem:
         #print(os.path.join(destination,"pgcdem",fdem))
@@ -26,8 +29,12 @@ def demextract(directory=None,destination=None,delete=None):
         os.remove(os.path.join(destination,"pgcmeta",fm))
     filesmt = os.listdir(os.path.join(destination,"pgcmt"))
     for fmt in filesmt:
-        #print(os.path.join(destination,"pgcmeta",fm))
+        #print(os.path.join(destination,"pgcmeta",fmt))
         os.remove(os.path.join(destination,"pgcmt",fmt))
+    filesreg = os.listdir(os.path.join(destination,"pgcreg"))
+    for fmr in filesreg:
+        #print(os.path.join(destination,"pgcmeta",fmr))
+        os.remove(os.path.join(destination,"pgcreg",fmr))
     for fname in files:
         filepath=os.path.join(directory,fname)
         if (filepath.endswith("tar.gz")):
@@ -44,7 +51,7 @@ def demextract(directory=None,destination=None,delete=None):
     jp= [y for x in os.walk(destination) for y in glob(os.path.join(x[0], '*.tif'))]
     mf= [y for x in os.walk(destination) for y in glob(os.path.join(x[0], '*.txt'))]
     for mfd in mf:
-        if mfd.count("mdf")!=1:
+        if mfd.count("mdf")!=1 and mfd.count("reg")!=1:
             os.unlink(mfd)
     tifcount= [y for x in os.walk(destination) for y in glob(os.path.join(x[0], '*.tif'))]
     mfcount= [y for x in os.walk(destination) for y in glob(os.path.join(x[0], '*.txt'))]
@@ -60,8 +67,13 @@ def demextract(directory=None,destination=None,delete=None):
             basetif=os.path.basename(tifffile)
             shutil.move(tifffile, os.path.join(destination,"pgcmt",basetif))
     for textfile in mfcount:
-        basemeta=os.path.basename(textfile)
-        shutil.move(textfile, os.path.join(destination,"pgcmeta",basemeta))
+        if textfile.endswith("mdf.txt"):
+            basemeta=os.path.basename(textfile)
+            shutil.move(textfile, os.path.join(destination,"pgcmeta",basemeta))
+    for textfile in mfcount:
+        if textfile.endswith("reg.txt"):
+            basemeta=os.path.basename(textfile)
+            shutil.move(textfile, os.path.join(destination,"pgcreg",basemeta))
     if delete=="yes":
         tarcount=[y for x in os.walk(directory) for y in glob(os.path.join(x[0], '*.tar'))]+[y for x in os.walk(directory) for y in glob(os.path.join(x[0], '*.tar.gz'))]
         for tar in tarcount:
